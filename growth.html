@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Growth Monitoring</title>
+    <link rel="stylesheet" href="grow.css">
+</head>
+<body>
+    <div class="sidebar">
+        <a href="index.html" class="btn btn-home">Home</a>
+    </div>
+    <div class="container">
+        <h1>Child Growth Monitoring</h1>
+        <p class="powered-by">Powered by ByteMe</p>
+        <form id="growth-form">
+            <div class="form-group">
+                <label for="age">Age (years):</label>
+                <input type="number" id="age" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="height">Height (cm):</label>
+                <input type="number" id="height" required>
+            </div>
+            <div class="form-group">
+                <label for="weight">Weight (kg):</label>
+                <input type="number" id="weight" required>
+            </div>
+            <button type="submit">Check Growth</button>
+        </form>
+        <button class="btn btn-refresh" onclick="refreshPage()">Refresh</button>
+    </div>
+
+    <script>
+        document.getElementById('growth-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (age < 2 || age > 17) {
+                alert("This growth monitoring tool is for children aged 2 to 17.");
+                return;
+            }
+
+            let resultText = `<div class="result-container"><h1>Growth Analysis Results</h1>`;
+
+            // Simple growth standards (example values)
+            const normalHeight = gender === 'male' ? age * 6 + 70 : age * 6 + 65; // Example formula for normal height
+            const normalWeight = gender === 'male' ? age * 2 + 8 : age * 2 + 7;  // Example formula for normal weight
+
+            if (height >= normalHeight - 5 && height <= normalHeight + 5) {
+                resultText += `<p>Height is within the normal range.</p>`;
+            } else if (height < normalHeight - 5) {
+                resultText += `<p>Height is slightly below the normal range. Consider a balanced diet rich in proteins and vitamins, regular physical activity, and consulting a pediatrician if concerned.</p>`;
+            } else {
+                resultText += `<p>Height is slightly above the normal range. Ensure a balanced diet and regular physical activity. Consult a pediatrician if concerned.</p>`;
+            }
+
+            if (weight >= normalWeight - 2 && weight <= normalWeight + 2) {
+                resultText += `<p>Weight is within the normal range.</p>`;
+            } else if (weight < normalWeight - 2) {
+                resultText += `<p>Weight is slightly below the normal range. Consider a balanced diet with adequate calories, regular meals, and consulting a pediatrician if concerned.</p>`;
+            } else {
+                resultText += `<p>Weight is slightly above the normal range. Ensure a balanced diet, regular physical activity, and consult a pediatrician if concerned.</p>`;
+            }
+
+            resultText += `<p>Normal height for age: ${normalHeight} cm</p>`;
+            resultText += `<p>Normal weight for age: ${normalWeight} kg</p>`;
+            resultText += `</div>`;
+
+            // Open a new window and write the result to it
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Growth Analysis Results</title>
+                    <link rel="stylesheet" href="grow.css">
+                </head>
+                <body>
+                    <div class="sidebar">
+                               <a href="growth.html" class="btn btn-back">Back</a>
+                              </div>
+                    ${resultText}
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+        });
+
+        function refreshPage() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

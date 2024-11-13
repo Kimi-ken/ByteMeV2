@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <div class="sidebar">
+        <a href="index.html" class="btn btn-home">Home</a>
+    </div>
+    <div class="container">
+        <h1>BMI Calculator</h1>
+        <p class="powered-by">Powered by ByteMe</p>
+        <form id="bmi-form">
+            <div class="form-group">
+                <label for="age">Age (years):</label>
+                <input type="number" id="age" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="height">Height (cm):</label>
+                <input type="number" id="height" required>
+            </div>
+            <div class="form-group">
+                <label for="weight">Weight (kg):</label>
+                <input type="number" id="weight" required>
+            </div>
+            <button type="submit">Calculate BMI</button>
+        </form>
+        <button class="btn btn-refresh" onclick="refreshPage()">Refresh</button>
+    </div>
+
+    <script>
+        document.getElementById('bmi-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const height = parseFloat(document.getElementById('height').value) / 100;
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (age < 15) {
+                alert("This BMI calculator is for individuals aged 15 and above.");
+                return;
+            }
+
+            // Calculate BMI
+            const bmi = (weight / (height * height)).toFixed(2);
+
+            let resultText = `<div class="result-container"><h1>BMI Analysis Results</h1>`;
+            resultText += `<p>Your BMI is ${bmi}.</p>`;
+
+            if (bmi < 18.5) {
+                resultText += `<p>You are underweight. Consider a balanced diet with adequate calories, regular meals, and consulting a healthcare provider if concerned.</p>`;
+            } else if (bmi >= 18.5 && bmi <= 24.9) {
+                resultText += `<p>Your weight is within the normal range. Maintain a balanced diet and regular physical activity to stay healthy.</p>`;
+            } else if (bmi >= 25 && bmi <= 29.9) {
+                resultText += `<p>You are overweight. Consider a balanced diet, regular physical activity, and consulting a healthcare provider if concerned.</p>`;
+            } else {
+                resultText += `<p>You are obese. It's important to consult a healthcare provider for personalized advice and consider a balanced diet and regular physical activity.</p>`;
+            }
+
+            resultText += `</div>`;
+
+            // Open a new window and write the result to it
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>BMI Analysis Results</title>
+                    <link rel="stylesheet" href="style1.css">
+                </head>
+                <body>
+                    <div class="sidebar">
+                               <a href="bmi.html" class="btn btn-back">Back</a>
+                              </div>
+                    ${resultText}
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+        });
+
+        function refreshPage() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Analysis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <a href="index.html" class="btn btn-home">Home</a>
+    </div>
+    <div class="container">
+        <h1>Nutrition Analysis</h1>
+        <p class="powered-by">Powered by ByteMe</p>
+        <form id="nutrition-form">
+            <div class="form-group">
+                <label for="recipe">Enter Recipe:</label>
+                <textarea id="recipe" rows="10" required></textarea>
+            </div>
+            <button type="submit">Analyze Nutrition</button>
+        </form>
+        <div id="result"></div>
+        <button class="btn btn-refresh" onclick="refreshPage()">Refresh</button>
+    </div>
+
+    <script>
+        document.getElementById('nutrition-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const recipe = document.getElementById('recipe').value;
+            const apiKey = '000eaa235d83c26be03ea360969abdb8'; // Replace with your actual API key
+            const appId = 'b6b7e86b'; // Replace with your actual App ID
+
+            // Fetch nutrition data from API
+            fetch(`https://api.edamam.com/api/nutrition-details?app_id=${appId}&app_key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ingr: recipe.split('\n') })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    let resultText = `<div class="result-container"><h1>Nutrition Analysis Results</h1><p>Calories: ${data.calories}</p><ul>`;
+                    const mainNutrients = ['ENERC_KCAL', 'FAT', 'FASAT', 'CHOCDF', 'FIBTG', 'SUGAR', 'PROCNT'];
+                    mainNutrients.forEach(nutrient => {
+                        if (data.totalNutrients[nutrient]) {
+                            resultText += `<li><strong>${data.totalNutrients[nutrient].label}</strong>: ${data.totalNutrients[nutrient].quantity.toFixed(2)} ${data.totalNutrients[nutrient].unit}</li>`;
+                        }
+                    });
+                    resultText += `</ul></div>`;
+                    
+
+                    // Open a new window and write the result to it
+                    const newWindow = window.open('', '_blank');
+                    
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Nutrition Analysis Results</title>
+                            <link rel="stylesheet" href="style.css">
+                        </head>
+                        <body>
+                              
+                              <div class="sidebar">
+                               <a href="nutri.html" class="btn btn-back">Back</a>
+                              </div>
+                            ${resultText}
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Error</title>
+                            <link rel="stylesheet" href="style.css">
+                        </head>
+                        <body>
+                            <div class="result-container">
+                                <h1>Error</h1>
+                                <p>Error fetching data. Please try again later.</p>
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                });
+        });
+
+        function refreshPage() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
